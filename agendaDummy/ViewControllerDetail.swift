@@ -9,17 +9,34 @@
 import UIKit
 
 class ViewControllerDetail: UIViewController {
+    
+    
+    var nombreDetalle:String?
+    var telefonoDetalle:String?
+    var correoDetalle:String?
+    
+    
+    var objectDetail:Agenda?
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        self.lblNombre.text = "Nombre: \(self.objectDetail!.nombre!)"
+        self.lblTelefono.text = "Telefono: \(self.objectDetail!.telefono!)"
+        self.lblCorreo.text = "Correo: \(self.objectDetail!.correo!)"
+       
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    @IBOutlet weak var lblNombre: UILabel!
+    @IBOutlet weak var lblTelefono: UILabel!
+    @IBOutlet weak var lblCorreo: UILabel!
+
     
 
     /*
