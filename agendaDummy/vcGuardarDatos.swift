@@ -10,6 +10,8 @@ import UIKit
 import CoreData
 
 class vcGuardarDatos: UIViewController {
+    
+    var estaArriba:Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,12 +24,114 @@ class vcGuardarDatos: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        self.registrarNotificacionTeclado()
+        registrarTextCorreo()
+        
+    }
+    override func viewWillDisappear(animated: Bool) {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardDidShowNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UITextFieldTextDidChangeNotification, object: txtCorreo)
+        
+        print("Quit all notifications")
+        
+        
+    }
+    func registrarNotificacionTeclado(){
+        print("Add NotificationCenter")
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(vcGuardarDatos.tecladoAparece), name: UIKeyboardDidShowNotification, object: nil)
+        
+         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(vcGuardarDatos.teclaBaja(_:)), name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    func registrarTextCorreo() {
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.formatoCorreo), name: UITextFieldTextDidChangeNotification, object: txtCorreo)
+        
+        
+    }
+    func formatoCorreo() {
+        if txtCorreo.text?.characters.count>0{
+            outletbtnGuardar.enabled = false
+            
+            if  validaCorreo(){
+                outletbtnGuardar.enabled = true
+            }
+            else{
+                outletbtnGuardar.enabled = false
+
+            }
+        }
+        else{
+            outletbtnGuardar.enabled = true
+        }
+        
+        
+    }
+    
+    func tecladoAparece(notification:NSNotification) {
+        
+        if estaArriba {
+            return
+        }
+        
+        let info: NSDictionary = (notification.userInfo! as NSDictionary)
+        
+        let keyboardSize = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue() //obtener el tamaño del teclado
+        
+        print("el teclado APARECE")
+        print("keyboardSize \(keyboardSize.height)" )
+        
+        
+        
+        var contentSize:CGSize = self.view.bounds.size
+        contentSize.height = (self.view.bounds.size.height + (keyboardSize.height - 40))
+        
+        self.elScrollView.contentSize = contentSize
+        print("contentSize: \(contentSize)" )
+        
+        estaArriba = true
+
+    }
+    func teclaBaja(notification: NSNotification){
+        
+        print("el teclado se va a ocultar")
+        let info: NSDictionary = (notification.userInfo! as NSDictionary)
+        
+        let sizeKeyBoard = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+        
+        
+        print("el teclado DESPARECE")
+        print("keyboardSize \(sizeKeyBoard)" )
+        
+        
+        var contentSize:CGSize = elScrollView.contentSize
+        
+        //var contentSize:CGSize = self.view.bounds.size
+        
+        contentSize.height = (elScrollView.contentSize.height - (sizeKeyBoard.height + 50))
+        
+        self.elScrollView.contentSize = contentSize
+        print("contentSize: \(contentSize)" )
+	
+        self.estaArriba = false
+    }
+    
+    
     @IBOutlet weak var txtNombre: UITextField!
     @IBOutlet weak var txtTelefono: UITextField!
     @IBOutlet weak var txtConfirmarTelefono: UITextField!
     @IBOutlet weak var txtCorreo: UITextField!
     
+    @IBOutlet weak var elScrollView: UIScrollView!
     
+    @IBOutlet weak var elNavigationView: UINavigationItem!
+    
+    @IBOutlet weak var outletbtnGuardar: UIButton!
     
     
     @IBAction func btnGuardarDatos(sender: AnyObject) {
@@ -41,12 +145,14 @@ class vcGuardarDatos: UIViewController {
             msj = "El numero de telefono es fozoso"
         }
         else if txtConfirmarTelefono.text == "" {
-            msj = "La confirmacion del numero de telefono es querida"
+            msj = "La confirmacion del numero de telefono es requerida"
         }
         
         if msj != "" {
             let alert = UIAlertController(title: "Atencion", message: msj, preferredStyle: .Alert)
             let ac = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            
+            
             
             alert.addAction(ac)
             
@@ -116,7 +222,7 @@ class vcGuardarDatos: UIViewController {
         
     
     }
-    
+    //valida correo con expresion regular
     func validaCorreo() -> Bool {
         
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
@@ -157,7 +263,6 @@ class vcGuardarDatos: UIViewController {
         
         do{
             try DBManager.instance.managedObjectContext!.save()
-            //self.navigationController?.popViewControllerAnimated(true)
             self.dismissViewControllerAnimated(true, completion: nil)
         }
         catch{
@@ -192,11 +297,3 @@ class vcGuardarDatos: UIViewController {
     */
 
 }
-/*func RegistrarNotificacionTeclado(){
-    //print("Add NotificationCenter"
-    
-    NotificationCenter.default.addObserver(self, selector: #selector(vcGurdarDatos.TecladoAparece), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
-    
-    NotificationCenter.default.addObserver(self, selector: #selector(VC_PropiedadTag.TecladoDesaparece), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    
-}*/

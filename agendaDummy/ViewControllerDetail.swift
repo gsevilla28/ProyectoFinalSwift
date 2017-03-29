@@ -21,6 +21,8 @@ class ViewControllerDetail: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.7)
 
         // Do any additional setup after loading the view.
         self.lblNombre.text = "Nombre: \(self.objectDetail!.nombre!)"
@@ -37,6 +39,10 @@ class ViewControllerDetail: UIViewController {
     @IBOutlet weak var lblTelefono: UILabel!
     @IBOutlet weak var lblCorreo: UILabel!
 
+    @IBAction func closePopUp(sender: AnyObject) {
+        self.view.removeFromSuperview()
+    }
+   
     
 
     /*

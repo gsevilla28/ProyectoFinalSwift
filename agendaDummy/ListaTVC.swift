@@ -21,22 +21,17 @@ class ListaTVC: UITableViewController {
         
         self.losContactos = NSArray()
         
-        
-
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        //DBManager.instance.encuentraTodosLos("Agenda", ordenadoPor: "String")
     }
     override func viewWillAppear(animated: Bool) {
         self.losContactos = DBManager.instance.encuentraTodosLos("Agenda", ordenadoPor: "String")
         self.tableView.reloadData()
     }
-    
-    
     
 
     override func didReceiveMemoryWarning() {
@@ -121,28 +116,43 @@ class ListaTVC: UITableViewController {
         return true
     }
     */
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let popOverVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("sbPopUpID") as! ViewControllerDetail
+        
+        popOverVC.objectDetail = self.losContactos?.objectAtIndex(indexPath.row) as! Agenda
+        
+        
+        self.addChildViewController(popOverVC)
+        popOverVC.view.frame = self.view.frame
+        self.view.addSubview(popOverVC.view)
+        popOverVC.didMoveToParentViewController(self)
+
+    }
 
     
     // MARK: - Navigation
+    /*
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
-        if segue.identifier == "showDetail" {
+        /*if segue.identifier == "showDetail" {
+            
+            /*
             if let indexPath = self.tableView.indexPathForSelectedRow?.row {
-                //let object = DBManager.instance.encuentraTodosLos("Agenda", ordenadoPor: "").objectAtIndexPath(indexPath)
                 let elObjeto = self.losContactos?.objectAtIndex(indexPath) as! Agenda
                 let destino = segue.destinationViewController as! ViewControllerDetail
-                //let destino = (segue.destinationViewController as! UINavigationController) as! ViewControllerDetail
                 destino.objectDetail = elObjeto
                 
-            }
-        }
+            }*/
+        }*/
     }
-/*
+
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
     }
-  */
-
+ 
+*/
 }
